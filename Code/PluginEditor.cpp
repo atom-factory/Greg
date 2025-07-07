@@ -4,85 +4,10 @@
 
 GregEditor::GregEditor(GregProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p), mDriveIndicator(40.0f), mToneIndicator(16.0f), mMixIndicator(16.0f) {
-    // getLookAndFeel().setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xff4a90e2));
-    // getLookAndFeel().setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff2c3e50));
-
     loadImages();
     updatePresetName();
-
-    mPresetLabel.setFont(juce::Font(16.0f, juce::Font::bold));
-    mPresetLabel.setJustificationType(juce::Justification::centred);
-    mPresetLabel.setColour(juce::Label::textColourId, juce::Colours::lightgrey);
-    addAndMakeVisible(mPresetLabel);
-
-    mPowerButton.setImages(true,
-                           true,
-                           true,
-                           mPowerButtonImage,
-                           1.0f,
-                           juce::Colours::transparentWhite,
-                           mPowerButtonImage,
-                           0.78f,
-                           juce::Colours::transparentWhite,
-                           mPowerButtonImage,
-                           0.56f,
-                           juce::Colours::transparentWhite);
-    addAndMakeVisible(mPowerButton);
-
-    mPresetLeftButton.setImages(true,
-                                true,
-                                true,
-                                mLeftArrowImage,
-                                1.0f,
-                                juce::Colours::transparentWhite,
-                                mLeftArrowImage,
-                                0.78f,
-                                juce::Colours::transparentWhite,
-                                mLeftArrowImage,
-                                0.56f,
-                                juce::Colours::transparentWhite);
-    addAndMakeVisible(mPresetLeftButton);
-
-    mPresetRightButton.setImages(true,
-                                 true,
-                                 true,
-                                 mRightArrowImage,
-                                 1.0f,
-                                 juce::Colours::transparentWhite,
-                                 mRightArrowImage,
-                                 0.78f,
-                                 juce::Colours::transparentWhite,
-                                 mRightArrowImage,
-                                 0.56f,
-                                 juce::Colours::transparentWhite);
-    addAndMakeVisible(mPresetRightButton);
-
-    mDriveIndicator.setRange(0.0, 30.0, 0.1);
-    mDriveIndicator.setValue(0.0);
-    addAndMakeVisible(mDriveIndicator);
-
-    mToneIndicator.setRange(0.0, 100.0, 0.1);
-    mToneIndicator.setValue(0.0);
-    addAndMakeVisible(mToneIndicator);
-
-    mMixIndicator.setRange(0.0, 100.0, 0.1);
-    mMixIndicator.setValue(100.0);
-    addAndMakeVisible(mMixIndicator);
-
-    mDriveAttachment =
-      std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,
-                                                                             "drive",
-                                                                             mDriveIndicator);
-    mToneAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,
-                                                                                             "tone",
-                                                                                             mToneIndicator);
-    mMixAttachment  = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,
-                                                                                            "mix",
-                                                                                            mMixIndicator);
-    mOutputAttachment =
-      std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,
-                                                                             "output",
-                                                                             mOutputSlider);
+    setupComponents();
+    createAttachments();
 
     // Set the editor size
     setSize(700, 460);
@@ -117,4 +42,91 @@ void GregEditor::loadImages() {
     mRightArrowImage =
       juce::ImageCache::getFromMemory(BinaryData::right_arrow1x_png, BinaryData::right_arrow1x_pngSize);
     mLeftArrowImage = juce::ImageCache::getFromMemory(BinaryData::left_arrow1x_png, BinaryData::left_arrow1x_pngSize);
+}
+
+void GregEditor::setupComponents() {
+    mPresetLabel.setFont(juce::Font(16.0f, juce::Font::bold));
+    mPresetLabel.setJustificationType(juce::Justification::centred);
+    mPresetLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
+    addAndMakeVisible(mPresetLabel);
+
+    mPowerButton.setImages(false,
+                           true,
+                           true,
+                           mPowerButtonImage,
+                           1.0f,
+                           juce::Colours::transparentBlack,
+                           juce::Image(),
+                           1.0f,
+                           juce::Colours::transparentBlack,
+                           mPowerButtonImage,
+                           1.0f,
+                           juce::Colours::darkgrey);
+    mPowerButton.setClickingTogglesState(true);
+    mPowerButton.setToggleState(false, juce::dontSendNotification);
+    // Callback isn't really necessary for this button, but will be needed for the preset nav buttons
+    // mPowerButton.onClick = [this]() {};
+    addAndMakeVisible(mPowerButton);
+
+    mPresetLeftButton.setImages(false,
+                                true,
+                                true,
+                                mLeftArrowImage,
+                                1.0f,
+                                juce::Colours::transparentWhite,
+                                mLeftArrowImage,
+                                0.78f,
+                                juce::Colours::transparentWhite,
+                                mLeftArrowImage,
+                                0.56f,
+                                juce::Colours::transparentWhite);
+    addAndMakeVisible(mPresetLeftButton);
+
+    mPresetRightButton.setImages(false,
+                                 true,
+                                 true,
+                                 mRightArrowImage,
+                                 1.0f,
+                                 juce::Colours::transparentWhite,
+                                 mRightArrowImage,
+                                 0.78f,
+                                 juce::Colours::transparentWhite,
+                                 mRightArrowImage,
+                                 0.56f,
+                                 juce::Colours::transparentWhite);
+    addAndMakeVisible(mPresetRightButton);
+
+    mDriveIndicator.setRange(0.0, 30.0, 0.1);
+    mDriveIndicator.setValue(0.0);
+    addAndMakeVisible(mDriveIndicator);
+
+    mToneIndicator.setRange(0.0, 100.0, 0.1);
+    mToneIndicator.setValue(0.0);
+    addAndMakeVisible(mToneIndicator);
+
+    mMixIndicator.setRange(0.0, 100.0, 0.1);
+    mMixIndicator.setValue(100.0);
+    addAndMakeVisible(mMixIndicator);
+}
+
+void GregEditor::createAttachments() {
+    mPowerButtonAttachment =
+      std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.mParameters,
+                                                                             "bypass",
+                                                                             mPowerButton);
+
+    mDriveAttachment =
+      std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,
+                                                                             "drive",
+                                                                             mDriveIndicator);
+    mToneAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,
+                                                                                             "tone",
+                                                                                             mToneIndicator);
+    mMixAttachment  = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,
+                                                                                            "mix",
+                                                                                            mMixIndicator);
+    mOutputAttachment =
+      std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,
+                                                                             "output",
+                                                                             mOutputSlider);
 }

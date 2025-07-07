@@ -7,9 +7,9 @@
 #include "KnobIndicator.hpp"
 #include "PluginProcessor.hpp"
 
-class GregEditor : public juce::AudioProcessorEditor {
+class GregEditor final : public juce::AudioProcessorEditor {
 public:
-    GregEditor(GregProcessor&);
+    explicit GregEditor(GregProcessor&);
     ~GregEditor() override;
 
     void paint(juce::Graphics&) override;
@@ -18,6 +18,8 @@ public:
 
 private:
     void loadImages();
+    void setupComponents();
+    void createAttachments();
 
     GregProcessor& audioProcessor;
 

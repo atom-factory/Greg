@@ -66,7 +66,7 @@ private:
     float mPreviousMix    = 100.0f;
     float mPreviousOutput = 0.0f;
 
-    float applySaturation(float input, float drive);
+    static float applySaturation(float input, float drive);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GregProcessor)
 };

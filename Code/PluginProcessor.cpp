@@ -90,6 +90,10 @@ bool GregProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const {
 
 void GregProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) {
     juce::ScopedNoDenormals noDenormals;
+
+    const bool isBypassed = mParameters.getRawParameterValue("bypass")->load() > 0.5f;
+    if (isBypassed) return;
+
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
@@ -209,23 +213,26 @@ void GregProcessor::setCurrentPresetName(const juce::String& name) {
 juce::AudioProcessorValueTreeState::ParameterLayout GregProcessor::createParameterLayout() {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
-    // Parameters creation
+    params.push_back(std::make_unique<juce::AudioParameterBool>("bypass", "Bypass", false));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>("drive",
                                                                  "Drive",
                                                                  juce::NormalisableRange<float>(0.0f, 30.0f, 0.1f),
                                                                  0.0f,
                                                                  "dB"));
+
     params.push_back(std::make_unique<juce::AudioParameterFloat>("tone",
                                                                  "Tone",
                                                                  juce::NormalisableRange<float>(0.0f, 100.0f, 0.1f),
                                                                  100.0f,
                                                                  "%"));
+
     params.push_back(std::make_unique<juce::AudioParameterFloat>("mix",
                                                                  "Mix",
                                                                  juce::NormalisableRange<float>(0.0f, 100.0f, 0.1f),
                                                                  100.0f,
                                                                  "%"));
+
     params.push_back(std::make_unique<juce::AudioParameterFloat>("output",
                                                                  "Output",
                                                                  juce::NormalisableRange<float>(-30.0f, 30.0f, 0.1f),
@@ -236,14 +243,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout GregProcessor::createParamet
 }
 
 float GregProcessor::applySaturation(float input, float drive) {
-    // float scaledInput = input * drive;
-    // // Apply saturation with compensation
-    // float saturated = std::tanh(scaledInput);
-    // // Optional: Add some harmonic complexity
-    // saturated += 0.1f * std::tanh(3.0f * scaledInput);
-    //
-    // return saturated;
-
     float fundamental = input;
     float harmonic    = std::sin(input * drive * 2.0f);
     return std::tanh((fundamental + harmonic * 0.3f) * drive);
