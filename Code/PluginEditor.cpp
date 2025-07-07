@@ -29,10 +29,11 @@ void GregEditor::resized() {
     mDriveIndicator.setBounds(247, 131, 204, 204);
     mToneIndicator.setBounds(73, 183, 100, 100);
     mMixIndicator.setBounds(526, 183, 100, 100);
+    mPreButton.setBounds(79, 298, 86, 50);
 }
 
 void GregEditor::updatePresetName() {
-    juce::String currentPresetName = audioProcessor.getCurrentPresetName();
+    const juce::String currentPresetName = audioProcessor.getCurrentPresetName();
     mPresetLabel.setText(currentPresetName, juce::dontSendNotification);
 }
 
@@ -42,6 +43,8 @@ void GregEditor::loadImages() {
     mRightArrowImage =
       juce::ImageCache::getFromMemory(BinaryData::right_arrow1x_png, BinaryData::right_arrow1x_pngSize);
     mLeftArrowImage = juce::ImageCache::getFromMemory(BinaryData::left_arrow1x_png, BinaryData::left_arrow1x_pngSize);
+    mPreOffImage    = juce::ImageCache::getFromMemory(BinaryData::pre_off1x_png, BinaryData::pre_off1x_pngSize);
+    mPreOnImage     = juce::ImageCache::getFromMemory(BinaryData::pre_on1x_png, BinaryData::pre_on1x_pngSize);
 }
 
 void GregEditor::setupComponents() {
@@ -67,6 +70,23 @@ void GregEditor::setupComponents() {
     // Callback isn't really necessary for this button, but will be needed for the preset nav buttons
     // mPowerButton.onClick = [this]() {};
     addAndMakeVisible(mPowerButton);
+
+    mPreButton.setImages(false,
+                         true,
+                         true,
+                         mPreOffImage,
+                         1.0f,
+                         juce::Colours::transparentBlack,
+                         juce::Image(),
+                         1.0f,
+                         juce::Colours::transparentBlack,
+                         mPreOnImage,
+                         1.0f,
+                         juce::Colours::transparentBlack);
+    mPreButton.setClickingTogglesState(true);
+    mPreButton.setToggleState(true, juce::dontSendNotification);
+    // mPreButton.onClick = [this]() {};
+    addAndMakeVisible(mPreButton);
 
     mPresetLeftButton.setImages(false,
                                 true,
@@ -114,6 +134,11 @@ void GregEditor::createAttachments() {
       std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.mParameters,
                                                                              "bypass",
                                                                              mPowerButton);
+
+    mPreButtonAttachment =
+      std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.mParameters,
+                                                                             "pre",
+                                                                             mPreButton);
 
     mDriveAttachment =
       std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.mParameters,

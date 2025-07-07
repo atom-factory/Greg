@@ -12,6 +12,8 @@ juce_add_binary_data(ImageResources
     Resources/left_arrow@1x.png
     Resources/right_arrow@1x.png
     Resources/power_btn@1x.png
+    Resources/pre_off@1x.png
+    Resources/pre_on@1x.png
     HEADER_NAME BinaryData.h
     NAMESPACE BinaryData
 )

@@ -27,6 +27,8 @@ private:
     juce::Image mPowerButtonImage;
     juce::Image mRightArrowImage;
     juce::Image mLeftArrowImage;
+    juce::Image mPreOffImage;
+    juce::Image mPreOnImage;
 
     KnobIndicator mDriveIndicator;
     KnobIndicator mToneIndicator;
@@ -36,6 +38,7 @@ private:
     juce::ImageButton mPowerButton;
     juce::ImageButton mPresetLeftButton;
     juce::ImageButton mPresetRightButton;
+    juce::ImageButton mPreButton;
 
     juce::Label mDriveLabel;
     juce::Label mToneLabel;
@@ -48,6 +51,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mMixAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mOutputAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mPowerButtonAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mPreButtonAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GregEditor)
 };

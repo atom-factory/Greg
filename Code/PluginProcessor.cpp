@@ -94,6 +94,8 @@ void GregProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuf
     const bool isBypassed = mParameters.getRawParameterValue("bypass")->load() > 0.5f;
     if (isBypassed) return;
 
+    const bool isFilterPre = mParameters.getRawParameterValue("pre")->load() < 0.5f;
+
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
@@ -149,10 +151,7 @@ void GregProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuf
             // Apply saturation
             float processedSample = applySaturation(channelData[sample], driveLinear);
 
-            // // Apply tone control (simple high-frequency roll-off)
-            // // This is a simplified tone control - you might want something more sophisticated
-            // float toneAmount = smoothedTone * 0.01f;
-            // processedSample  = processedSample * toneAmount + channelData[sample] * (1.0f - toneAmount);
+            // TODO: Tone filter
 
             // Apply output gain
             processedSample *= outputLinear;
@@ -214,6 +213,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout GregProcessor::createParamet
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
     params.push_back(std::make_unique<juce::AudioParameterBool>("bypass", "Bypass", false));
+    params.push_back(std::make_unique<juce::AudioParameterBool>("pre", "Pre", false));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>("drive",
                                                                  "Drive",
